@@ -3,35 +3,36 @@ pipeline {
 
     environment {
         GITHUB_REPO      = 'https://github.com/vominhduong/blogApp_cicd.git'
-        SONARQUBE_SERVER = 'SonarQube'
+        BRANCH_NAME      = 'main'
+        SERVICE_NAME     = 'api-gateway'
+        SERVICE_PATH     = 'backend/api-gateway'
+        GRADLE_MODULE    = ':backend:api-gateway'
         DOCKER_IMAGE     = 'khanhduy05/api-gateway'
         DOCKER_TAG       = "${BUILD_NUMBER}"
-        K8S_NAMESPACE    = 'production'
-        DEPLOYMENT_NAME  = 'api-gateway'
-        CONTAINER_NAME   = 'api-gateway'
+        SONARQUBE_SERVER = 'SonarQube'
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                echo '========== Checkout Code from GitHub =========='
-                git branch: 'main', url: "${GITHUB_REPO}"
+                echo '========== Checkout Code =========='
+                git branch: "${BRANCH_NAME}", url: "${GITHUB_REPO}"
                 sh 'chmod +x gradlew'
             }
         }
 
-        stage('Build & Test') {
+        stage('Build Service') {
             steps {
-                echo '========== Build Application =========='
-                sh './gradlew clean build'
+                echo '========== Build API Gateway =========='
+                sh "./gradlew ${GRADLE_MODULE}:clean ${GRADLE_MODULE}:build"
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                echo '========== SonarQube Code Quality Analysis =========='
+                echo '========== SonarQube Analysis =========='
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh './gradlew sonarqube'
+                    sh "./gradlew sonarqube"
                 }
             }
         }
@@ -47,14 +48,27 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo '========== Build Docker Image =========='
-                sh """
-                    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
-                """
+                dir("${SERVICE_PATH}") {
+                    sh """
+                        docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                        docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                    """
+                }
             }
         }
-}
-    
+
+        stage('Push Docker Image') {
+            steps {
+                echo '========== Push Docker Image =========='
+                withDockerRegistry([credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/']) {
+                    sh """
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker push ${DOCKER_IMAGE}:latest
+                    """
+                }
+            }
+        }
+    }
 
     post {
         always {
