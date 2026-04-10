@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+
+    environment {
+        GITHUB_REPO      = 'https://github.com/vominhduong/blogApp_cicd.git'
+        SONARQUBE_SERVER = 'SonarQube'
+        DOCKER_IMAGE     = 'khanhduy05/api-gateway'
+        DOCKER_TAG       = "${BUILD_NUMBER}"
+        K8S_NAMESPACE    = 'production'
+        DEPLOYMENT_NAME  = 'api-gateway'
+        CONTAINER_NAME   = 'api-gateway'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo '========== Checkout Code from GitHub =========='
+                git branch: 'main', url: "${GITHUB_REPO}"
+                sh 'chmod +x gradlew'
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                echo '========== Build Application =========='
+                sh './gradlew clean build'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                echo '========== SonarQube Code Quality Analysis =========='
+                withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                    sh './gradlew sonarqube'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo '========== Build Docker Image =========='
+                sh """
+                    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                """
+            }
+        }
+}
+    
+
+    post {
+        always {
+            echo '========== Pipeline Finished =========='
+            cleanWs()
+        }
+        success {
+            echo 'Pipeline executed successfully'
+        }
+        failure {
+            echo 'Pipeline failed - Check logs for details'
+        }
+    }
+}
