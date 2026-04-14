@@ -12,6 +12,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 echo '========== Checkout Code =========='
@@ -24,6 +25,13 @@ pipeline {
             steps {
                 echo '========== Build API Gateway =========='
                 sh "./gradlew ${GRADLE_MODULE}:clean ${GRADLE_MODULE}:build"
+            }
+        }
+
+        stage('Check Build Output') {
+            steps {
+                echo '========== Check JAR =========='
+                sh "ls -lah backend/${SERVICE_NAME}/build/libs/"
             }
         }
 
