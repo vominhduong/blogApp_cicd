@@ -4,15 +4,16 @@ pipeline {
     environment {
         GITHUB_REPO      = 'https://github.com/vominhduong/blogApp_cicd.git'
         BRANCH_NAME      = 'main'
-        SERVICE_NAME     = 'api-gateway'
-        SERVICE_PATH     = 'backend/api-gateway'
-        GRADLE_MODULE    = ':backend:api-gateway'
-        DOCKER_IMAGE     = 'khanhduy05/api-gateway'
+        SERVICE_NAME     = 'comment-service'
+        SERVICE_PATH     = 'backend/comment-service'
+        GRADLE_MODULE    = ':backend:comment-service'
+        DOCKER_IMAGE     = 'khanhduy05/comment-service'
         DOCKER_TAG       = "${BUILD_NUMBER}"
         SONARQUBE_SERVER = 'SonarQube'
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 echo '========== Checkout Code =========='
@@ -25,6 +26,13 @@ pipeline {
             steps {
                 echo '========== Build API Gateway =========='
                 sh "./gradlew ${GRADLE_MODULE}:clean ${GRADLE_MODULE}:build"
+            }
+        }
+
+        stage('Check Build Output') {
+            steps {
+                echo '========== Check JAR =========='
+                sh "ls -lah backend/${SERVICE_NAME}/build/libs/"
             }
         }
 
@@ -48,9 +56,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo '========== Build Docker Image =========='
+                
                 dir("${SERVICE_PATH}") {
                     sh """
                         docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                        
                         docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
                     """
                 }

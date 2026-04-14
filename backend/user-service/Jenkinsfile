@@ -13,6 +13,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 echo '========== Checkout Code =========='
@@ -25,6 +26,13 @@ pipeline {
             steps {
                 echo '========== Build API Gateway =========='
                 sh "./gradlew ${GRADLE_MODULE}:clean ${GRADLE_MODULE}:build"
+            }
+        }
+
+        stage('Check Build Output') {
+            steps {
+                echo '========== Check JAR =========='
+                sh "ls -lah backend/${SERVICE_NAME}/build/libs/"
             }
         }
 
@@ -48,9 +56,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo '========== Build Docker Image =========='
+                
                 dir("${SERVICE_PATH}") {
                     sh """
                         docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                        
                         docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
                     """
                 }
