@@ -1,9 +1,8 @@
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Vì ngữ cảnh (context) đã là thư mục của chính service này, 
-# ta copy thẳng file .jar từ thư mục build/libs vào image và đổi tên thành app.jar cho gọn.
-COPY build/libs/*.jar app.jar
+# SỬA LỖI: Thêm dấu / ở cuối để báo cho Docker biết /app/ là một thư mục
+COPY build/libs/*.jar /app/
 
-# Khởi chạy ứng dụng
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Dùng sh -c để shell tự động tìm và chạy file .jar hiện có trong thư mục
+CMD ["sh", "-c", "java -jar /app/*.jar"]
