@@ -14,7 +14,7 @@ The system follows a clean microservices architecture with **service discovery, 
 
 > No local PostgreSQL installation is required. Databases run in containers.
 
----
+------
 
 ## Technical Specifications
 
