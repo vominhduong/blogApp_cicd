@@ -4,9 +4,9 @@ pipeline {
     environment {
         GITHUB_REPO      = 'https://github.com/vominhduong/blogApp_cicd.git'
         BRANCH_NAME      = 'main'
-        SERVICE_NAME     = 'api-gateway'
-        GRADLE_MODULE    = ':backend:api-gateway'
-        DOCKER_IMAGE     = 'khanhduy05/api-gateway'
+        SERVICE_NAME     = 'frontend'
+        SERVICE_PATH     = 'frontend'
+        DOCKER_IMAGE     = 'khanhduy05/frontend'
         DOCKER_TAG       = "${BUILD_NUMBER}"
         SONARQUBE_SERVER = 'SonarQube'
     }
@@ -16,45 +16,37 @@ pipeline {
             steps {
                 echo '========== Checkout Code =========='
                 git branch: "${BRANCH_NAME}", url: "${GITHUB_REPO}"
-                sh 'chmod +x gradlew'
             }
         }
 
-        stage('Build Service') {
+        stage('Install Dependencies') {
             steps {
-                echo '========== Build API Gateway =========='
-                sh "./gradlew ${GRADLE_MODULE}:clean ${GRADLE_MODULE}:build"
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                echo '========== SonarQube Analysis =========='
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh "./gradlew sonarqube"
+                echo '========== Install Frontend Dependencies =========='
+                dir("${SERVICE_PATH}") {
+                    sh 'npm install'
                 }
             }
         }
 
-        stage('Quality Gate') {
+        stage('Build Frontend') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                echo '========== Build Frontend =========='
+                dir("${SERVICE_PATH}") {
+                    sh 'npm run build'
                 }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
                 echo '========== Build Docker Image =========='
-                sh """
-                    docker build \
-                      --build-arg SERVICE_NAME=${SERVICE_NAME} \
-                      -t ${DOCKER_IMAGE}:${DOCKER_TAG} \
-                      -f Dockerfile .
-
-                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
-                """
+                dir("${SERVICE_PATH}") {
+                    sh """
+                        docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                        docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                    """
+                }
             }
         }
 
