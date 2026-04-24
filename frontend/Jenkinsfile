@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS' 
+    }
+    
     environment {
         GITHUB_REPO      = 'https://github.com/vominhduong/blogApp_cicd.git'
         BRANCH_NAME      = 'main'
