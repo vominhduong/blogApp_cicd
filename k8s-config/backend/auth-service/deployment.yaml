@@ -21,17 +21,24 @@ spec:
           command:
             - sh
             - -c
-            - until nc -z eureka-server 8761; do echo waiting for eureka-server; sleep 2; done
+            - |
+              until nc -z eureka-server 8761; do
+                echo "waiting for eureka-server";
+                sleep 2;
+              done
       containers:
         - name: auth-service
           image: khanhduy05/auth-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 9001
+          env:
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
           resources:
             requests:
-              cpu: "200m"
-              memory: "384Mi"
+              cpu: "100m"
+              memory: "256Mi"
             limits:
               cpu: "500m"
               memory: "768Mi"
@@ -39,17 +46,19 @@ spec:
             httpGet:
               path: /actuator/health
               port: 9001
-            failureThreshold: 30
+            failureThreshold: 40
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 9001
-            initialDelaySeconds: 20
+            initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 9001
-            initialDelaySeconds: 60
+            initialDelaySeconds: 90
             periodSeconds: 20
+            failureThreshold: 3
