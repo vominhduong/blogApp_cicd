@@ -43,21 +43,18 @@ spec:
               cpu: "500m"
               memory: "768Mi"
           startupProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 9001
             failureThreshold: 40
             periodSeconds: 10
           readinessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 9001
             initialDelaySeconds: 30
             periodSeconds: 10
             failureThreshold: 6
           livenessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 9001
             initialDelaySeconds: 90
             periodSeconds: 20
