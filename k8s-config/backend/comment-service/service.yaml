@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: comment-service
+  namespace: production
+  labels:
+    app: comment-service
+spec:
+  selector:
+    app: comment-service
+  ports:
+    - protocol: TCP
+      port: 9004
+      targetPort: 9004
+  type: ClusterIP

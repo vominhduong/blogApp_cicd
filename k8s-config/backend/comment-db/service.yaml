@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: comment-db
+  namespace: production
+  labels:
+    app: comment-db
+spec:
+  selector:
+    app: comment-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP

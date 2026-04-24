@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: article-db
+  namespace: production
+  labels:
+    app: article-db
+spec:
+  selector:
+    app: article-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
