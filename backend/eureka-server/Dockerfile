@@ -1,8 +1,6 @@
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# SỬA LỖI: Thêm dấu / ở cuối để báo cho Docker biết /app/ là một thư mục
-COPY build/libs/*.jar /app/
+COPY build/libs/eureka-server-*.jar app.jar
 
-# Dùng sh -c để shell tự động tìm và chạy file .jar hiện có trong thư mục
-CMD ["sh", "-c", "java -jar /app/*.jar"]
+CMD ["java", "-jar", "app.jar"]
