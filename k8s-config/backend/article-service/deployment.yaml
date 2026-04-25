@@ -23,7 +23,6 @@ spec:
             - -c
             - |
               until nc -z article-db 5432; do echo waiting for article-db; sleep 2; done
-              until nc -z eureka-server 8761; do echo waiting for eureka-server; sleep 2; done
       containers:
         - name: article-service
           image: khanhduy05/article-service:41
@@ -31,20 +30,14 @@ spec:
           ports:
             - containerPort: 9003
           env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: K8S_SERVICE_NAME
-              value: article-service
-            - name: K8S_SERVICE_DNS
-              value: $(K8S_SERVICE_NAME).$(POD_NAMESPACE).svc.cluster.local
-            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka-server.$(POD_NAMESPACE).svc.cluster.local:8761/eureka/
+            - name: USER_SERVICE_URL
+              value: http://user-service:9002
+            - name: COMMENT_SERVICE_URL
+              value: http://comment-service:9004
+            - name: SPRING_CLOUD_DISCOVERY_ENABLED
+              value: "false"
+            - name: EUREKA_CLIENT_ENABLED
+              value: "false"
           resources:
             requests:
               cpu: "150m"

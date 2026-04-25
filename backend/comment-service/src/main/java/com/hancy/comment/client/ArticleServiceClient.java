@@ -4,7 +4,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "article-service", fallback = ArticleServiceFallback.class)
+@FeignClient(
+    name = "article-service",
+    url = "${services.article-service.url}",
+    fallback = ArticleServiceFallback.class)
 public interface ArticleServiceClient {
 
   @GetMapping("/api/articles/{id}")

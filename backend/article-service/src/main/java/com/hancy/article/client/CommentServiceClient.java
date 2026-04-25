@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "comment-service")
+@FeignClient(name = "comment-service", url = "${services.comment-service.url}")
 public interface CommentServiceClient {
 
   @DeleteMapping("/api/comments/by-article/{articleId}")
