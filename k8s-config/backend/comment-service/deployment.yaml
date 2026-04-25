@@ -26,7 +26,7 @@ spec:
               until nc -z eureka-server 8761; do echo waiting for eureka-server; sleep 2; done
       containers:
         - name: comment-service
-          image: khanhduy05/comment-service:latest
+          image: khanhduy05/comment-service:30
           imagePullPolicy: Always
           ports:
             - containerPort: 9004

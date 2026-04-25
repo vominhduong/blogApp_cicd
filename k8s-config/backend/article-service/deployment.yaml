@@ -26,7 +26,7 @@ spec:
               until nc -z eureka-server 8761; do echo waiting for eureka-server; sleep 2; done
       containers:
         - name: article-service
-          image: khanhduy05/article-service:latest
+          image: khanhduy05/article-service:32
           imagePullPolicy: Always
           ports:
             - containerPort: 9003
