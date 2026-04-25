@@ -28,7 +28,7 @@ spec:
               done
       containers:
         - name: auth-service
-          image: khanhduy05/auth-service:32
+          image: khanhduy05/auth-service:41
           imagePullPolicy: Always
           ports:
             - containerPort: 9001
