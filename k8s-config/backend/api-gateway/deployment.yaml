@@ -24,7 +24,7 @@ spec:
             - until nc -z eureka-server 8761; do echo waiting for eureka-server; sleep 2; done
       containers:
         - name: api-gateway
-          image: khanhduy05/api-gateway:latest
+          image: khanhduy05/api-gateway:demo
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
