@@ -30,11 +30,11 @@ spec:
             - containerPort: 8080
           resources:
             requests:
-              cpu: "200m"
-              memory: "384Mi"
+              cpu: "100m"
+              memory: "256Mi"
             limits:
-              cpu: "500m"
-              memory: "768Mi"
+              cpu: "300m"
+              memory: "512Mi"
           startupProbe:
             httpGet:
               path: /actuator/health

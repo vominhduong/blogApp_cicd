@@ -23,11 +23,11 @@ spec:
             - containerPort: 8761
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
+              cpu: "100m"
+              memory: "192Mi"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "250m"
+              memory: "384Mi"
           startupProbe:
             httpGet:
               path: /actuator/health
