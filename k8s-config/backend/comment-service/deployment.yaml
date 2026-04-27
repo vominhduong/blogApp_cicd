@@ -30,14 +30,24 @@ spec:
           ports:
             - containerPort: 9004
           env:
+            - name: SPRING_APPLICATION_NAME
+              value: comment-service
+            - name: K8S_SERVICE_DNS
+              value: comment-service
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka/
+            - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+              value: "true"
+            - name: EUREKA_CLIENT_FETCH_REGISTRY
+              value: "true"
             - name: USER_SERVICE_URL
               value: http://user-service:9002
             - name: ARTICLE_SERVICE_URL
               value: http://article-service:9003
             - name: SPRING_CLOUD_DISCOVERY_ENABLED
-              value: "false"
+              value: "true"
             - name: EUREKA_CLIENT_ENABLED
-              value: "false"
+              value: "true"
           resources:
             requests:
               cpu: "150m"
